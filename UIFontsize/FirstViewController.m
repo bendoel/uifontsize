@@ -7,6 +7,7 @@
 //
 
 #import "FirstViewController.h"
+#import "UFDynamicTableViewCell.h"
 
 @interface FirstViewController ()
 {
@@ -22,7 +23,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    arrayFontSize = @[@16, @18, @20, @26, @44];
+    arrayFontSize = @[@9, @10, @12, @14, @16, @18, @20, @24, @26, @32, @44];
 }
 
 
@@ -44,22 +45,24 @@
 }
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FontCellIdentifier" forIndexPath:indexPath];
+    UFDynamicTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FontCellIdentifier" forIndexPath:indexPath];
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%@", arrayFontSize[indexPath.row]];
-    int size = arrayFontSize[indexPath.row];
-    [cell.textLabel setFont:[UIFont systemFontOfSize:(CGFloat)size]];
+    NSNumber *fontSize = arrayFontSize[indexPath.row];
+    [self setupCell:cell atIndexPath:indexPath withFontSize:[fontSize floatValue]];
     
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static UITableViewCell *cell = nil;
+    static UFDynamicTableViewCell *cell = nil;
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
         cell = [tableView dequeueReusableCellWithIdentifier:@"FontCellIdentifier"];
     });
+    
+    NSNumber *fontSize = arrayFontSize[indexPath.row];
+    [self setupCell:cell atIndexPath:indexPath withFontSize:[fontSize floatValue]];
     
     return [self calculateHeightForConfiguredSizingCell:cell];
 }
@@ -69,6 +72,12 @@
     
     CGSize size = [sizingCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
     return size.height;
+}
+
+- (void) setupCell: (UFDynamicTableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath withFontSize:(CGFloat )fontSize
+{
+    cell.TextLabel.text = [NSString stringWithFormat:@"%d", [arrayFontSize[indexPath.row] intValue]];
+    [cell.TextLabel setFont:[UIFont systemFontOfSize:fontSize]];
 }
 
 @end
